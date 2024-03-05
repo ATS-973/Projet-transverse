@@ -43,3 +43,15 @@ class Player:
         self.name = name
         self.teamName = teamName
         self.skin = skin
+    
+    def change_skin(self, new_skin):
+        if self.skin != new_skin:
+            self.skin = new_skin
+    
+    def change_name(self, new_name):
+        if self.name != new_name:
+            self.name = new_name
+    
+    def change_teamName(self, new_teamName):
+        if self.teamName != new_teamName:
+            self.teamName = new_teamName
