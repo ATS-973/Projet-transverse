@@ -7,18 +7,15 @@ class Worm:
         self.team = team
         self.attack = 0
         self.move = 1
-        self.skin = skin
-
-    def move(self):
-        pass
+        self.skin = pygame.image.load(skin)
 
     def attack(self):
         pass
 
-    def status(self, attack, move):
+    def change_status(self, attack, move):  #Take two 1 or 0 as parameters, 1 for True and 0 for False
         if attack == 1 and move == 1:
             raise ValueError("Attack and move status can't be active together")
-        elif attack == 0 and move == 0:
+        if attack == 0 and move == 0:
             raise ValueError("Attack and move status can't be inactive together")
         if attack != 1 and attack != 0:
             raise ValueError("Attack must be a boolean")
@@ -27,6 +24,13 @@ class Worm:
         else:
             self.attack = attack
             self.move = move
+    
+    def move_right(self, value):
+        self.x = value
+    def move_left(self, value):  #Don't put a negative value
+        self.x = -value
+    def jump(self, value):   #Don't put a negative value
+        self.y = -value
 
     def lose_life(self, value):
         self.pv -= value
@@ -42,11 +46,11 @@ class Player:
     def __init__(self, name, teamName, skin):
         self.name = name
         self.teamName = teamName
-        self.skin = skin
+        self.skin = pygame.image.load(skin)
     
     def change_skin(self, new_skin):
-        if self.skin != new_skin:
-            self.skin = new_skin
+        if self.skin != pygame.image.load(new_skin):
+            self.skin = pygame.image.load(new_skin)
     
     def change_name(self, new_name):
         if self.name != new_name:
