@@ -5,9 +5,9 @@
  - La DA -- Gaby
  - La GUI -- Gaby
  - Les armes et leurs caractéristiques -- Corentin
-     - Batte
-     - Coup de poing
-     - Grenade
-     - Bombe (rase 1/2 maps)
-     - Arme à feu
+     - Coup de poing                 Commun
+     - Batte                         Commun
+     - Grenade                       Epic
+     - Arme à feu                    Rare
+     - Bombe (rase 1/2 maps)         Légendaire
  - Le gameplay -- Anthony
