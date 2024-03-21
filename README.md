@@ -8,9 +8,6 @@
      - Batte
      - Coup de poing
      - Grenade
-     - gun
-     - semi
-     - pompe
-     - jetpack
      - Bombe (rase 1/2 maps)
+     - Arme à feu
  - Le gameplay -- Anthony
