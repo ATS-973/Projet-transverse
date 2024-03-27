@@ -8,6 +8,7 @@ class Worm:
         self.attack = 0
         self.move = 1
         self.skin = pygame.image.load(skin)
+        self.jump = 0
 
     def attack(self):
         pass
@@ -30,7 +31,9 @@ class Worm:
     def move_left(self, value):  #Don't put a negative value
         self.x = -value
     def jump(self, value):   #Don't put a negative value
-        self.y = -value
+        if self.jump == 0:
+            self.y = -value
+            self.jump = 1   #A REMETTRE A 0
 
     def lose_life(self, value):
         self.pv -= value
