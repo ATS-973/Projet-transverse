@@ -12,3 +12,6 @@ Then need to add librairies:
       -pygame
       -pytmx
       -pyscroll
+
+
+Finally, run display_map.py
