@@ -25,15 +25,6 @@ class Worm:
         else:
             self.attack = attack
             self.move = move
-    
-    def move_right(self, value):
-        self.x = value
-    def move_left(self, value):  #Don't put a negative value
-        self.x = -value
-    def jump(self, value):   #Don't put a negative value
-        if self.jump == 0:
-            self.y = -value
-            self.jump = 1   #A REMETTRE A 0
 
     def lose_life(self, value):
         self.pv -= value
@@ -57,19 +48,30 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.position = [x, y]
         self.speed = 3
+        self.gravity = 1
+        self.touchGround = 1
+        self.jump = 20
         self.feet = pygame.Rect(0,0, self.rect.width * 0.5, 24)
         self.old_position = self.position.copy()
 
     def save_location(self): self.old_position = self.position.copy()
 
-    def move_right(self): self.position[0] += self.speed
-    def move_left(self): self.position[0] -= self.speed
-    def move_up(self): self.position[1] -= self.speed
-    def move_down(self): self.position[1] += self.speed
+    def move_right(self):
+        self.position[0] += self.speed
+    def move_left(self):
+        self.position[0] -= self.speed
+    def move_up(self):
+        self.position[1] -= self.jump
+        self.touchGround = 0
+
+    def groundTouched(self):
+        self.touchGround = 1
 
     def update(self):
         self.rect.topleft = self.position
         self.feet.midbottom = self.rect.midbottom
+        if self.touchGround == 0:
+            self.position[1] += self.gravity
 
     def move_back(self):
         self.position = self.old_position

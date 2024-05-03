@@ -21,10 +21,13 @@ class Game:
 
         #definir une liste pour les collisions
         self.walls = []
+        self.ground = []
 
         for obj in tmx_data.objects:
             if obj.type == "collision":
                 self.walls.append(pygame.Rect(obj.x,obj.y,obj.width,obj.height))
+            elif obj.type == "ground":
+                self.ground.append(pygame.Rect(obj.x, obj.y,obj.width,obj.height))
 
          # générer le jouer
         self.player = Player(player_position.x,player_position.y)
@@ -37,10 +40,8 @@ class Game:
     def handle_input(self):
         pressed = pygame.key.get_pressed()
 
-        if pressed[pygame.K_UP]:
+        if pressed[pygame.K_UP] and self.player.touchGround == 1:
             self.player.move_up()
-        elif pressed[pygame.K_DOWN]:
-            self.player.move_down()
         elif pressed[pygame.K_LEFT]:
             self.player.move_left()
         elif pressed[pygame.K_RIGHT]:
@@ -53,6 +54,10 @@ class Game:
         for sprite in self.group.sprites():
             if sprite.feet.collidelist(self.walls) > -1:
                 sprite.move_back()
+            if sprite.feet.collidelist(self.ground) > -1:
+                self.player.groundTouched()
+            if sprite.feet.collidelist(self.ground) == False and self.player.touchGround == 1:
+                self.player.touchGround = 0
 
     def run(self):
 
