@@ -64,9 +64,6 @@ class Player(pygame.sprite.Sprite):
         self.position[1] -= self.jump
         self.touchGround = 0
 
-    def groundTouched(self):
-        self.touchGround = 1
-
     def update(self):
         self.rect.topleft = self.position
         self.feet.midbottom = self.rect.midbottom
