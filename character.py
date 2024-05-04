@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 3
         self.gravity = 1
         self.touchGround = 1
-        self.jump = 20
+        self.jump = 40
         self.feet = pygame.Rect(0,0, self.rect.width * 0.5, 24)
         self.old_position = self.position.copy()
 

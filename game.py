@@ -7,12 +7,12 @@ from character import Player
 class Game:
 
     def __init__(self):
-        self.screen = pygame.display.set_mode((420, 280))
+        self.screen = pygame.display.set_mode((1918, 1078))
         pygame.display.set_caption("Pygame Tiled Demo")
 
 
         # charger la carte (tmx)
-        tmx_data = pytmx.util_pygame.load_pygame('map_plate.tmx')
+        tmx_data = pytmx.util_pygame.load_pygame('Map/Map.tmx')
         map_data = pyscroll.data.TiledMapData(tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
 
