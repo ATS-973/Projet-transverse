@@ -7,12 +7,12 @@ from character import Player
 class Game:
 
     def __init__(self):
-        self.screen = pygame.display.set_mode((420, 280))
+        self.screen = pygame.display.set_mode((1918, 1078))
         pygame.display.set_caption("Pygame Tiled Demo")
 
 
         # charger la carte (tmx)
-        tmx_data = pytmx.util_pygame.load_pygame('map_plate.tmx')
+        tmx_data = pytmx.util_pygame.load_pygame('Map/Map.tmx')
         map_data = pyscroll.data.TiledMapData(tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
 
@@ -56,6 +56,8 @@ class Game:
                 sprite.move_back()
             if sprite.feet.collidelist(self.ground) > -1:
                 self.player.groundTouched()
+            else:
+                self.player.touchGround = 0
             if sprite.feet.collidelist(self.ground) == False and self.player.touchGround == 1:
                 self.player.touchGround = 0
 
