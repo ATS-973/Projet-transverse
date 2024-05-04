@@ -53,14 +53,12 @@ class Game:
 
         #verif collision
         for sprite in self.group.sprites():
-            #if sprite.feet.collidelist(self.walls) > -1:
-            #    sprite.move_back()
+            if sprite.feet.collidelist(self.walls) > -1:
+                sprite.move_back()
             if sprite.feet.collidelist(self.ground) > -1:
                 self.player.touchGround = 1
-                print("Ground")
             else: #sprite.feet.collidelist(self.ground) == False:
                 self.player.touchGround = 0
-                print("Not ground")
 
     def run(self):
 
