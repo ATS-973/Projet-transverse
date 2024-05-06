@@ -12,11 +12,11 @@
             "expandedGroupLayers": [
                 9
             ],
-            "scale": 2,
-            "selectedLayer": 3,
+            "scale": 4,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1601.25,
-                "y": 676.75
+                "x": 135.5,
+                "y": 641.5
             }
         },
         "clouds.tsx": {
