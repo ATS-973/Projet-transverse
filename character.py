@@ -50,10 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 3
         self.gravity = 1
         self.touchGround = 1
-        self.jump_heigt = 40
-        #self.gravity_jump = 
-        self.y_veloity = self.jump_heigt
-        self.jump = 0
+        self.jump = 40
         self.feet = pygame.Rect(0,0, self.rect.width * 0.5, 24)
         self.old_position = self.position.copy()
 
@@ -64,22 +61,17 @@ class Player(pygame.sprite.Sprite):
     def move_left(self):
         self.position[0] -= self.speed
     def move_up(self):
-        self.position[1] -= self.jump_heigt
+        self.position[1] -= self.jump
         self.touchGround = 0
-        #self.jump = 1
+
+    def groundTouched(self):
+        self.touchGround = 1
 
     def update(self):
         self.rect.topleft = self.position
         self.feet.midbottom = self.rect.midbottom
-        if self.touchGround == 0 and self.jump == 0:
+        if self.touchGround == 0:
             self.position[1] += self.gravity
-        #while self.jump == 1:
-        #    self.position[1] -= self.y_veloity
-        #    self.y_veloity -= self.gravity
-        #    if self.y_veloity < -self.jump_heigt:
-        #        self.jump = 0
-        #        self.y_veloity = self.jump_heigt
-
 
     def move_back(self):
         self.position = self.old_position
