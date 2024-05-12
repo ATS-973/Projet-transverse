@@ -1,13 +1,17 @@
-# Projet-transverse
+Need to put in a directory :  
+      -character.py
+      -display_map.py
+      -game.py
+      -map_plate.tmx
+      -tile.tsx
+      -tilemap-characters.png
+      -tilemap_packed.png
 
- - Une classe perso -- Achille
- - Un moteur physique (équations de gravité) -- Amine
- - La DA -- Gaby
- - La GUI -- Gaby
- - Les armes et leurs caractéristiques -- Corentin
-     - Coup de poing                 Commun
-     - Batte                         Commun
-     - Grenade                       Epic
-     - Arme à feu                    Rare
-     - Bombe (rase 1/2 maps)         Légendaire
- - Le gameplay -- Anthony
+
+Then need to add librairies:
+      -pygame
+      -pytmx
+      -pyscroll
+
+
+Finally, run display_map.py

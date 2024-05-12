@@ -1,0 +1,73 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "Map.tmx": {
+            "expandedGroupLayers": [
+                9
+            ],
+            "scale": 2,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 788,
+                "y": 533.5
+            }
+        },
+        "clouds.tsx": {
+            "scaleInDock": 0.125,
+            "scaleInEditor": 1
+        },
+        "mountain.tsx": {
+            "scaleInDock": 0.0625,
+            "scaleInEditor": 0.25
+        },
+        "sky.tsx": {
+            "scaleInDock": 0.125,
+            "scaleInEditor": 1
+        },
+        "tiled_packed.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "trees.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 0.33
+        }
+    },
+    "last.imagePath": "C:/Projet transverse/Map",
+    "map.height": 77,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 14,
+    "map.tileWidth": 14,
+    "map.width": 137,
+    "openFiles": [
+        "Map.tmx",
+        "tiled_packed.tsx",
+        "sky.tsx",
+        "trees.tsx",
+        "mountain.tsx",
+        "clouds.tsx"
+    ],
+    "project": "map.tiled-project",
+    "recentFiles": [
+        "clouds.tsx",
+        "mountain.tsx",
+        "trees.tsx",
+        "sky.tsx",
+        "tiled_packed.tsx",
+        "Map.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 14,
+        "width": 14
+    },
+    "tileset.transparentColor": "#323331",
+    "tileset.useTransparentColor": true
+}

@@ -1,4 +1,4 @@
-#import pygame
+import pygame
 
 class Worm:
     def __init__(self, name, pv, team, skin):
@@ -8,6 +8,7 @@ class Worm:
         self.attack = 0
         self.move = 1
         self.skin = pygame.image.load(skin)
+        self.jump = 0
 
     def attack(self):
         pass
@@ -24,13 +25,6 @@ class Worm:
         else:
             self.attack = attack
             self.move = move
-    
-    def move_right(self, value):
-        self.x = value
-    def move_left(self, value):  #Don't put a negative value
-        self.x = -value
-    def jump(self, value):   #Don't put a negative value
-        self.y = -value
 
     def lose_life(self, value):
         self.pv -= value
@@ -42,20 +36,52 @@ class Worm:
         if self.pv <= 0:
             pass
 
-class Player:
-    def __init__(self, name, teamName, skin):
-        self.name = name
-        self.teamName = teamName
-        self.skin = pygame.image.load(skin)
-    
-    def change_skin(self, new_skin):
-        if self.skin != pygame.image.load(new_skin):
-            self.skin = pygame.image.load(new_skin)
-    
-    def change_name(self, new_name):
-        if self.name != new_name:
-            self.name = new_name
-    
-    def change_teamName(self, new_teamName):
-        if self.teamName != new_teamName:
-            self.teamName = new_teamName
+#code pour les test
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+
+
+        super().__init__()
+        self.sprite_sheet = pygame.image.load('tilemap-characters.png')
+        self.image = self.get_image(0,0)
+        self.image.set_colorkey([0,0,0])
+        self.rect = self.image.get_rect()
+        self.position = [x, y]
+        self.speed = 3
+        self.gravity = 1
+        self.touchGround = 1
+        self.jump = 40
+        self.feet = pygame.Rect(0,0, self.rect.width * 0.5, 24)
+        self.old_position = self.position.copy()
+
+    def save_location(self): self.old_position = self.position.copy()
+
+    def move_right(self):
+        self.position[0] += self.speed
+    def move_left(self):
+        self.position[0] -= self.speed
+    def move_up(self):
+        self.position[1] -= self.jump
+        self.touchGround = 0
+
+    def groundTouched(self):
+        self.touchGround = 1
+
+    def update(self):
+        self.rect.topleft = self.position
+        self.feet.midbottom = self.rect.midbottom
+        if self.touchGround == 0:
+            self.position[1] += self.gravity
+
+    def move_back(self):
+        self.position = self.old_position
+        self.rect.topleft = self.position
+        self.feet.midbottom = self.rect.midbottom
+
+
+    def get_image(self, x, y):
+        image = pygame.Surface([20, 24])
+        image.blit(self.sprite_sheet, (0,0), (x, y, 20, 24))
+        return image
+
+# Fin code test
