@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="137" height="77" tilewidth="14" tileheight="14" infinite="0" nextlayerid="15" nextobjectid="315">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="137" height="77" tilewidth="14" tileheight="14" infinite="0" nextlayerid="15" nextobjectid="320">
  <tileset firstgid="1" source="tiled_packed.tsx"/>
  <tileset firstgid="276" source="sky.tsx"/>
  <tileset firstgid="47708" source="mountain.tsx"/>
@@ -168,7 +168,22 @@
 </data>
  </layer>
  <objectgroup id="11" name="Spawn">
-  <object id="82" name="Player" x="24.67" y="577.084">
+  <object id="82" name="Player_1_1" x="29.67" y="577.584">
+   <point/>
+  </object>
+  <object id="315" name="Player_1_2" x="341" y="570">
+   <point/>
+  </object>
+  <object id="316" name="Player_1_3" x="613" y="715.5">
+   <point/>
+  </object>
+  <object id="317" name="Player_2_1" x="1881" y="735">
+   <point/>
+  </object>
+  <object id="318" name="Player_2_2" x="1555" y="723">
+   <point/>
+  </object>
+  <object id="319" name="Player_2_3" x="1377" y="444.5">
    <point/>
   </object>
  </objectgroup>

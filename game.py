@@ -3,8 +3,7 @@ import pytmx
 import pyscroll
 import math
 from character import Player
-
-
+from Weapon import *
 
 
 
@@ -38,7 +37,7 @@ class Game:
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
 
         #coordonnées de spawn du joueur
-        player_position = tmx_data.get_object_by_name("Player")
+        player_position = tmx_data.get_object_by_name("Player_1_1")
 
         #definir une liste pour les collisions
         self.walls = []
@@ -70,6 +69,9 @@ class Game:
         elif pressed[pygame.K_ESCAPE]:
             self.is_playing = False
 
+        elif pressed[pygame.K_1]:
+            self.tir()
+
     def update(self):
         self.group.update()
 
@@ -81,8 +83,79 @@ class Game:
                 self.player.groundTouched()
             else:
                 self.player.touchGround = 0
+        self.player.is_in_air()
 
 
+        #TEST
+    bullet_1 = Bullet(0, 0, 10, (255, 255, 255))
+
+    def redraw(self):
+        global bullet_1
+        self.group.draw(self.screen)
+        bullet_1.load_image(self.screen)
+        pygame.draw.line(self.screen, (0, 0, 0), line[0], line[1])
+        pygame.display.update()
+
+    def findAngle(self, pos):
+        global bullet_1
+        x = bullet_1.position[0]
+        y = bullet_1.position[1]
+        try:
+            angle = math.atan((y - pos[1]) / (x - pos[0]))
+        except:
+            angle = math.pi / 2
+        if pos[1] < y and pos[0] > x:
+            angle = abs(angle)
+        elif pos[1] < y and pos[0] < x:
+            angle = math.pi - angle
+        elif pos[1] > y and pos[0] < x:
+            angle = math.pi + abs(angle)
+        elif pos[1] > y and pos[0] > x:
+            angle = (2 * math.pi) - angle
+        return angle
+
+    def check_collision_bullet(self, sprite, group):
+        return sprite.rect.collidelist(group)
+
+    def tir(self):
+        global line, pos, bullet_1
+        bullet_1 = Bullet(self.player.position[0]+10, self.player.position[1]+15, radius, (255, 255, 255))
+        x, y, time, angle, shoot = self.player.position[0]+10, self.player.position[1]+15, 0, 0, False
+        run = True
+        while run:
+            bullet_1.rect[0]=bullet_1.position[0]
+            bullet_1.rect[1]=bullet_1.position[1]
+
+            if shoot:
+                time += 0.5
+                po = Bullet.path(x, y, angle, time)
+                bullet_1.position[0] = po[0]
+                bullet_1.position[1] = po[1]
+
+                #verif balle hors map
+                if bullet_1.rect.collidelist(self.walls) > -1:
+                    shoot = False
+                    bullet_1.position[0] = self.player.position[0]+10
+                    bullet_1.position[1] = self.player.position[1]+15
+                    run = False
+
+
+            pos = pygame.mouse.get_pos()
+            line = [(self.player.position[0]+10, self.player.position[1]+15), pos]
+            self.redraw()
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if not shoot:
+                        shoot = True
+                        x = bullet_1.position[0]
+                        y = bullet_1.position[1]
+                        time = 0
+                        angle = self.findAngle(pos)
+                elif pygame.key.get_pressed()[pygame.K_TAB]:
+                    run = False
+
+
+            # FIN DU TEST
     def run(self):
 
         clock = pygame.time.Clock()
