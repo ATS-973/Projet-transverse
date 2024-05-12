@@ -240,7 +240,7 @@ class Game:
         # Main game loop
         clock = pygame.time.Clock()
         running = True
-
+        victory_player1, victory_player2 = 0, 0
         while running:
             if self.is_playing:          # Check if player is playing
                 self.player.save_location()
@@ -248,9 +248,12 @@ class Game:
                 self.update()
                 self.group.draw(self.screen)
 
-                '''if ___:          #game over condition
-                    self.winner = ___       #number/color of winning player
-                    self.win_screen()'''
+                if victory_player1:          # Winning condition
+                    self.winner = 1
+                    self.win_screen()
+                elif victory_player2:
+                    self.winner = 2
+                    self.win_screen()
             else:
                 self.screen.blit(self.background, (0,0))
                 self.screen.blit(self.start_button, self.start_button_rect)
