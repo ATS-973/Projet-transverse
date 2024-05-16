@@ -5,25 +5,26 @@ import math
 from character import Player
 from Weapon import *
 
-
-
 class Game:
 
     def __init__(self):
 
-        #definir si le jeu a commencé
+    #definir si le jeu a commencé
         self.is_playing = False
+    #definir le winner
+        self.winner = None
 
+    #création de la fenetre
         self.screen = pygame.display.set_mode((1918, 1078))
         pygame.display.set_caption("Test")
         self.background = pygame.image.load("background.png")
-
+        #initialisation du start button
         self.start_button = pygame.image.load("start_button.png")
         self.start_button = pygame.transform.scale(self.start_button, (400,125))
         self.start_button_rect = self.start_button.get_rect()
         self.start_button_rect.x = math.ceil(self.screen.get_width() / 2.5)
         self.start_button_rect.y = math.ceil(self.screen.get_height() / 2)
-
+        #initialisation du quit button
         self.quit_button = pygame.image.load("quit_button.png")
         self.quit_button = pygame.transform.scale(self.quit_button, (400, 125))
         self.quit_button_rect = self.quit_button.get_rect()
@@ -36,59 +37,121 @@ class Game:
         map_data = pyscroll.data.TiledMapData(tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
 
-        #coordonnées de spawn du joueur
-        player_position = tmx_data.get_object_by_name("Player_1_1")
+        #coordonnées de spawn des joueurs
+        player_position1_1 = tmx_data.get_object_by_name("Player_1_1")
+        player_position1_2 = tmx_data.get_object_by_name("Player_1_2")
+        player_position1_3 = tmx_data.get_object_by_name("Player_1_3")
+        player_position2_1 = tmx_data.get_object_by_name("Player_2_1")
+        player_position2_2 = tmx_data.get_object_by_name("Player_2_2")
+        player_position2_3 = tmx_data.get_object_by_name("Player_2_3")
 
-        #definir une liste pour les collisions
+        # générer les joueurs
+        self.player1_1 = Player(player_position1_1.x, player_position1_1.y, "skin_orange.png", 1)
+        self.player1_2 = Player(player_position1_2.x, player_position1_2.y, "skin_orange.png", 1)
+        self.player1_3 = Player(player_position1_3.x, player_position1_3.y, "skin_orange.png", 1)
+        self.player2_1 = Player(player_position2_1.x, player_position2_1.y, "skin_rose.png", 2)
+        self.player2_2 = Player(player_position2_2.x, player_position2_2.y, "skin_rose.png", 2)
+        self.player2_3 = Player(player_position2_3.x, player_position2_3.y, "skin_rose.png", 2)
+
+        #definir listes pour les collisions
         self.walls = []
         self.ground = []
+        self.team1 = []
+        self.team2 = []
 
+        #ajout des coordonnées dans les listes de coliision
         for obj in tmx_data.objects:
             if obj.type == "collision":
                 self.walls.append(pygame.Rect(obj.x,obj.y,obj.width,obj.height))
             elif obj.type == "ground":
                 self.ground.append(pygame.Rect(obj.x, obj.y,obj.width,obj.height))
 
-         # générer le jouer
-        self.player = Player(player_position.x,player_position.y)
+        self.team1.append(pygame.Rect(self.player1_1.position[0],self.player1_1.position[1],20,24))
+        self.team1.append(pygame.Rect(self.player1_2.position[0],self.player1_2.position[1],20,24))
+        self.team1.append(pygame.Rect(self.player1_3.position[0],self.player1_3.position[1],20,24))
+        self.team2.append(pygame.Rect(self.player2_1.position[0],self.player2_1.position[1],20,24))
+        self.team2.append(pygame.Rect(self.player2_2.position[0],self.player2_2.position[1],20,24))
+        self.team2.append(pygame.Rect(self.player2_3.position[0],self.player2_3.position[1],20,24))
+
+
 
 
         # dessiner le groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=1)
-        self.group.add(self.player)
+        self.group.add(self.player1_1)
+        self.group.add(self.player1_2)
+        self.group.add(self.player1_3)
+        self.group.add(self.player2_1)
+        self.group.add(self.player2_2)
+        self.group.add(self.player2_3)
 
-    def handle_input(self):
+
+
+#Actualise en temps réel les coordonnées des joueurs dans leur liste respective
+    def actu_liste_collision(self):
+        self.team1[0] = pygame.Rect(self.player1_1.position[0],self.player1_1.position[1],20,24)
+        self.team1[1] = pygame.Rect(self.player1_2.position[0],self.player1_2.position[1],20,24)
+        self.team1[2] = pygame.Rect(self.player1_3.position[0],self.player1_3.position[1],20,24)
+        self.team2[0] = pygame.Rect(self.player2_1.position[0],self.player2_1.position[1],20,24)
+        self.team2[1] = pygame.Rect(self.player2_2.position[0],self.player2_2.position[1],20,24)
+        self.team2[2] = pygame.Rect(self.player2_3.position[0],self.player2_3.position[1],20,24)
+
+
+
+#Permet de récupérer les inputs clavier et d'assigner des commandes aux touches
+    def handle_input(self,player):
         pressed = pygame.key.get_pressed()
 
-        if pressed[pygame.K_UP] and self.player.touchGround == 1:
-            self.player.move_up()
+        if pressed[pygame.K_UP] and player.touchGround == 1:
+            player.move_up()
         elif pressed[pygame.K_LEFT]:
-            self.player.move_left()
+            player.move_left()
         elif pressed[pygame.K_RIGHT]:
-            self.player.move_right()
+            player.move_right()
         elif pressed[pygame.K_ESCAPE]:
             self.is_playing = False
 
-        elif pressed[pygame.K_1]:
-            self.tir()
+        elif pressed[pygame.K_1] and player.touchGround == 1:
+            self.tir(player)
 
-    def update(self):
+
+
+#Permet de détecter à tous moment si le joueur entre en collision avec le décor ou si il est dans les airs
+    def update(self, player):
         self.group.update()
 
         #verif collision
-        for sprite in self.group.sprites():
-            if sprite.feet.collidelist(self.walls) > -1:
-                sprite.move_back()
-            if sprite.feet.collidelist(self.ground) > -1:
-                self.player.groundTouched()
-            else:
-                self.player.touchGround = 0
-        self.player.is_in_air()
+        if player.feet.collidelist(self.walls) > -1:
+            player.move_back()
+        if player.feet.collidelist(self.ground) > -1:
+            player.groundTouched()
+        else:
+            player.touchGround = 0
+        player.is_in_air()
 
 
-        #TEST
+
+#Permet d'afficher l'écran d'affichage du gagnant
+    def win_screen(self):
+        # Display win screen
+        self.screen.blit(self.background, (0, 0))
+        font = pygame.font.SysFont(None, 100)
+        if self.winner == 1:
+            text = font.render("PLAYER 1 IS THE WINNER", True, (255, 0, 0))
+        else:
+            text = font.render("PLAYER 2 IS THE WINNER", True, (255, 0, 0))
+        text_rect = text.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 2))
+        self.screen.blit(text, text_rect)
+        pygame.display.flip()
+
+
+
+    #création de la balle
     bullet_1 = Bullet(0, 0, 10, (255, 255, 255))
 
+
+
+#Permet de dessiner la ligne pour viser et l'image de la balle
     def redraw(self):
         global bullet_1
         self.group.draw(self.screen)
@@ -96,6 +159,9 @@ class Game:
         pygame.draw.line(self.screen, (0, 0, 0), line[0], line[1])
         pygame.display.update()
 
+
+
+#Permet de changer l'angle de tir à l'aide de la souris
     def findAngle(self, pos):
         global bullet_1
         x = bullet_1.position[0]
@@ -114,13 +180,13 @@ class Game:
             angle = (2 * math.pi) - angle
         return angle
 
-    def check_collision_bullet(self, sprite, group):
-        return sprite.rect.collidelist(group)
 
-    def tir(self):
+
+#Gestion du tir
+    def tir(self, player):
         global line, pos, bullet_1
-        bullet_1 = Bullet(self.player.position[0]+10, self.player.position[1]+15, radius, (255, 255, 255))
-        x, y, time, angle, shoot = self.player.position[0]+10, self.player.position[1]+15, 0, 0, False
+        bullet_1 = Bullet(player.position[0]+10, player.position[1]+15, radius, (255, 255, 255))
+        x, y, time, angle, shoot = player.position[0]+10, player.position[1]+15, 0, 0, False
         run = True
         while run:
             bullet_1.rect[0]=bullet_1.position[0]
@@ -135,13 +201,40 @@ class Game:
                 #verif balle hors map
                 if bullet_1.rect.collidelist(self.walls) > -1:
                     shoot = False
-                    bullet_1.position[0] = self.player.position[0]+10
-                    bullet_1.position[1] = self.player.position[1]+15
+                    bullet_1.position[0] = player.position[0]+10
+                    bullet_1.position[1] = player.position[1]+15
+                    run = False
+                    player.tour = False
+                #verif collision joueur
+                if player.team == 1:
+                    if bullet_1.rect.colliderect(self.team2[0]) and self.player2_1.is_alive:
+                        self.player2_1.loose_pv(bullet_1.damage)
+                        player.tour = False
+                    elif bullet_1.rect.colliderect(self.team2[1]) and self.player2_2.is_alive:
+                        self.player2_2.loose_pv(bullet_1.damage)
+                        player.tour = False
+                    elif bullet_1.rect.colliderect(self.team2[2]) and self.player2_3.is_alive:
+                        self.player2_3.loose_pv(bullet_1.damage)
+                        player.tour = False
+                elif player.team == 2:
+                    if bullet_1.rect.colliderect(self.team1[0]) and self.player1_1.is_alive:
+                        self.player1_1.loose_pv(bullet_1.damage)
+                        player.tour = False
+                    elif bullet_1.rect.colliderect(self.team1[1]) and self.player1_2.is_alive:
+                        self.player1_2.loose_pv(bullet_1.damage)
+                        player.tour = False
+                    elif bullet_1.rect.colliderect(self.team1[2]) and self.player1_3.is_alive:
+                        self.player1_3.loose_pv(bullet_1.damage)
+                        player.tour = False
+                if player.tour == False:
+                    shoot = False
+                    bullet_1.position[0] = player.position[0] + 10
+                    bullet_1.position[1] = player.position[1] + 15
                     run = False
 
 
             pos = pygame.mouse.get_pos()
-            line = [(self.player.position[0]+10, self.player.position[1]+15), pos]
+            line = [(player.position[0]+10, player.position[1]+15), pos]
             self.redraw()
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -155,7 +248,9 @@ class Game:
                     run = False
 
 
-            # FIN DU TEST
+
+
+#Fonction principale du jeu
     def run(self):
 
         clock = pygame.time.Clock()
@@ -164,13 +259,67 @@ class Game:
         running = True
 
         while running:
-
             # verif si le jeu a commencé
             if self.is_playing:
-                self.player.save_location()
-                self.handle_input()
-                self.update()
-                self.group.draw(self.screen)
+                self.actu_liste_collision()
+
+                if self.player1_1.is_alive and self.player1_1.tour == True:
+                    player = self.player1_1
+                    player.save_location()
+                    self.handle_input(player)
+                    self.update(self.player2_3)
+                    self.update(player)
+                    self.group.draw(self.screen)
+                elif self.player2_1.is_alive and self.player2_1.tour == True:
+                    player = self.player2_1
+                    player.save_location()
+                    self.handle_input(player)
+                    self.update(self.player1_1)
+                    self.update(player)
+                    self.group.draw(self.screen)
+                elif self.player1_2.is_alive and self.player1_2.tour == True:
+                    player = self.player1_2
+                    player.save_location()
+                    self.handle_input(player)
+                    self.update(self.player2_1)
+                    self.update(player)
+                    self.group.draw(self.screen)
+                elif self.player2_2.is_alive and self.player2_2.tour == True:
+                    player = self.player2_2
+                    player.save_location()
+                    self.handle_input(player)
+                    self.update(self.player1_2)
+                    self.update(player)
+                    self.group.draw(self.screen)
+                elif self.player1_3.is_alive and self.player1_3.tour == True:
+                    player = self.player1_3
+                    player.save_location()
+                    self.handle_input(player)
+                    self.update(self.player2_2)
+                    self.update(player)
+                    self.group.draw(self.screen)
+                elif self.player2_3.is_alive and self.player2_3.tour == True:
+                    player = self.player2_3
+                    player.save_location()
+                    self.handle_input(player)
+                    self.update(self.player1_3)
+                    self.update(player)
+                    self.group.draw(self.screen)
+                else:
+                    self.player1_1.tour = True
+                    self.player1_2.tour = True
+                    self.player1_3.tour = True
+                    self.player2_1.tour = True
+                    self.player2_2.tour = True
+                    self.player2_3.tour = True
+
+                if self.player1_1.is_alive == self.player1_2.is_alive == self.player1_3.is_alive == False:
+                    self.winner = 2
+                    self.win_screen()
+                elif self.player2_1.is_alive == self.player2_2.is_alive == self.player2_3.is_alive == False:
+                    self.winner = 1
+                    self.win_screen()
+
 
             else:
                 self.screen.blit(self.background, (0,0))

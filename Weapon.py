@@ -4,7 +4,7 @@ from game import *
 
 width = 1918
 height = 1078
-radius = 5
+radius = 4
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -16,6 +16,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.image.load("bullet.png")
         self.position = [x,y]
         self.rect = self.image.get_rect()
+        self.damage = 20
 
 
     def load_image(self, window):

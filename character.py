@@ -3,12 +3,12 @@ import pygame
 class Worm:
     def __init__(self, name, pv, team, skin):
         self.name = name
-        self.pv = pv
+
         self.team = team
         self.attack = 0
         self.move = 1
         self.skin = pygame.image.load(skin)
-        self.jump = 0
+
 
     def attack(self):
         pass
@@ -38,21 +38,38 @@ class Worm:
 
 #code pour les test
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y,skin, team):
 
 
         super().__init__()
-        self.sprite_sheet = pygame.image.load('tilemap-characters.png')
+        self.is_alive = True
+        self.pv = 100
+
+        self.team = team
+
+        self.sprite_sheet = pygame.image.load(skin)
         self.image = self.get_image(0,0)
         self.image.set_colorkey([0,0,0])
         self.rect = self.image.get_rect()
+
         self.position = [x, y]
+        self.feet = pygame.Rect(0, 0, self.rect.width * 0.5, 24)
+        self.old_position = self.position.copy()
+
         self.speed = 3
+        self.jump = 40
+
         self.gravity = 1
         self.touchGround = 1
-        self.jump = 40
-        self.feet = pygame.Rect(0,0, self.rect.width * 0.5, 24)
-        self.old_position = self.position.copy()
+
+
+        self.tour = True
+
+    def loose_pv(self, damage):
+        self.pv -= damage
+        if self.pv <= 0:
+            self.is_alive = False
+            self.kill()
 
     def save_location(self): self.old_position = self.position.copy()
 
@@ -66,6 +83,12 @@ class Player(pygame.sprite.Sprite):
 
     def groundTouched(self):
         self.touchGround = 1
+
+    def is_in_air(self):
+        if self.touchGround == 0:
+            self.speed=1
+        else:
+            self.speed=3
 
     def update(self):
         self.rect.topleft = self.position
