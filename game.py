@@ -3,7 +3,7 @@ import pytmx
 import pyscroll
 import math
 from character import Player
-from Weapon import *
+from weapon import *
 
 class Game:
 
@@ -37,6 +37,7 @@ class Game:
         map_data = pyscroll.data.TiledMapData(tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
 
+
         #coordonnées de spawn des joueurs
         player_position1_1 = tmx_data.get_object_by_name("Player_1_1")
         player_position1_2 = tmx_data.get_object_by_name("Player_1_2")
@@ -53,7 +54,9 @@ class Game:
         self.player2_2 = Player(player_position2_2.x, player_position2_2.y, "skin_rose.png", 2)
         self.player2_3 = Player(player_position2_3.x, player_position2_3.y, "skin_rose.png", 2)
 
-        #definir listes pour les collisions
+
+
+    #definir listes pour les collisions
         self.walls = []
         self.ground = []
         self.team1 = []
@@ -113,7 +116,8 @@ class Game:
 
         elif pressed[pygame.K_1] and player.touchGround == 1:
             self.tir(player)
-
+        elif pressed[pygame.K_2] and player.touchGround == 1:
+            self.grenades(player)
 
 
 #Permet de détecter à tous moment si le joueur entre en collision avec le décor ou si il est dans les airs
@@ -146,6 +150,7 @@ class Game:
 
 
 
+    ################################### BULLET BEGINNING ###################################
     #création de la balle
     bullet_1 = Bullet(0, 0, 10, (255, 255, 255))
 
@@ -246,6 +251,102 @@ class Game:
                         angle = self.findAngle(pos)
                 elif pygame.key.get_pressed()[pygame.K_TAB]:
                     run = False
+
+    ################################### BULLET END ###################################
+
+    ################################### GRENADE BEGINNING ###################################
+    grenade_1 = Grenade(0, 0, 10, (255, 255, 255))
+
+
+    def redraw_grenade(self):
+        # Update grenade position and trajectory
+        global grenade_1
+        self.group.draw(self.screen)
+        grenade_1.load_image(self.screen)
+        pygame.draw.line(self.screen, (0, 0, 0), grenade_line[0], grenade_line[1])
+        pygame.display.update()
+
+    def findAngle_grenade(self, pos):
+        # Calculate angle for grenade trajectory
+        global grenade_1
+        x = grenade_1.position[0]
+        y = grenade_1.position[1]
+        try:
+            angle = math.atan((y - pos[1]) / (x - pos[0]))
+        except:
+            angle = math.pi / 2
+        if pos[1] < y and pos[0] > x:
+            angle = abs(angle)
+        elif pos[1] < y and pos[0] < x:
+            angle = math.pi - angle
+        elif pos[1] > y and pos[0] < x:
+            angle = math.pi + abs(angle)
+        elif pos[1] > y and pos[0] > x:
+            angle = (2 * math.pi) - angle
+        return angle
+
+    def check_collision_grenade(self, sprite, group):
+        # Check collision for grenade
+        return sprite.rect.collidelist(group)
+
+    def grenades(self, player):
+        # Grenade weapon functionality
+        global grenade_line, grenade_pos, grenade_1
+        grenade_1 = Grenade(player.position[0] + 10,player.position[1] + 15, radius, (255, 255, 255))
+        x, y, time, power, angle, shoot = player.position[0] + 10, player.position[1] + 15, 0, 0, 0, False
+        run = True
+        while run:
+            grenade_1.rect[0] = grenade_1.position[0]
+            grenade_1.rect[1] = grenade_1.position[1]
+
+            if shoot:
+                time += 0.02
+                po = Grenade.path(x, y, power, angle, time)
+                grenade_1.position[0] = po[0]
+                grenade_1.position[1] = po[1]
+
+                if grenade_1.rect.collidelist(self.walls) > -1:
+
+                    shoot = False
+                    grenade_1.explo_pos[0] = grenade_1.rect[0]
+                    grenade_1.explo_pos[1] = grenade_1.rect[1]
+                    grenade_1.position[0] = player.position[0] + 10
+                    grenade_1.position[1] = player.position[1] + 15
+                    player.tour = False
+                    run = False
+                    if player.team == 1:
+                        if abs(self.player2_1.position[0] - grenade_1.explo_pos[0]) <= 15:
+                            self.player2_1.loose_pv(grenade_1.full_damage)
+                        elif abs(self.player2_2.position[0]-grenade_1.explo_pos[0]) <= 22:
+                            self.player2_2.loose_pv(grenade_1.mid_damage)
+                        elif abs(self.player2_3.position[0]-grenade_1.explo_pos[0]) <= 30:
+                            self.player2_3.loose_pv(grenade_1.low_damage)
+                    elif player.team == 2:
+                        if abs(self.player1_1.position[0] - grenade_1.explo_pos[0]) <= 15:
+                            self.player1_1.loose_pv(grenade_1.full_damage)
+                        elif abs(self.player1_2.position[0] - grenade_1.explo_pos[0]) <= 22:
+                            self.player1_2.loose_pv(grenade_1.mid_damage)
+                        elif abs(self.player1_3.position[0] - grenade_1.explo_pos[0]) <= 30:
+                            self.player1_3.loose_pv(grenade_1.low_damage)
+
+
+            grenade_pos = pygame.mouse.get_pos()
+            grenade_line = [(player.position[0] + 10, player.position[1] + 15), grenade_pos]
+            self.redraw_grenade()
+
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if not shoot:
+                        shoot = True
+                        x = grenade_1.position[0]
+                        y = grenade_1.position[1]
+                        time = 0
+                        power = math.sqrt((grenade_pos[0] - grenade_1.position[0]) ** 2 + (
+                                    grenade_pos[1] - grenade_1.position[1]) ** 2) / 8
+                        angle = self.findAngle_grenade(grenade_pos)
+                elif pygame.key.get_pressed()[pygame.K_TAB]:
+                    run = False
+    ################################### GRENADE END ###################################
 
 
 
