@@ -24,7 +24,7 @@ class Game:
 
     #création de la fenetre
         self.screen = pygame.display.set_mode((1918, 1078))
-        pygame.display.set_caption("Test")
+        pygame.display.set_caption("Transverse Battle")
         self.background = pygame.image.load("background.png")
         #initialisation du start button
         self.start_button = pygame.image.load("start_button.png")
