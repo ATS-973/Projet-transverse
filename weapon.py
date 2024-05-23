@@ -53,7 +53,6 @@ class Grenade(pygame.sprite.Sprite):
         self.full_damage = 60
         self.mid_damage = 30
         self.low_damage = 10
-        self.explo_image = pygame.image.load("boom.png")
         self.explo_pos = [0,0]
 
 
