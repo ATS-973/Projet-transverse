@@ -14,10 +14,13 @@ class Game:
     #definir le winner
         self.winner = None
 
+    #def si le son du gagnant est jouée
+        self.win_music_is_playing = False
+
     #musique de fond
         pygame.mixer.init()
-        self.music = pygame.mixer.music.load("menu.mp3")
-        pygame.mixer.music.play()
+        pygame.mixer.music.load("menu.mp3")
+        pygame.mixer.music.play(-1)
 
     #création de la fenetre
         self.screen = pygame.display.set_mode((1918, 1078))
@@ -35,6 +38,11 @@ class Game:
         self.quit_button_rect = self.quit_button.get_rect()
         self.quit_button_rect.x = math.ceil(self.screen.get_width() / 2.5)
         self.quit_button_rect.y = math.ceil(self.screen.get_height() / 1.65)
+        #init du logo
+        self.logo = pygame.image.load("logo.png")
+        self.logo_rect = self.logo.get_rect()
+        self.logo_rect.x = math.ceil(self.screen.get_width()/2.445)
+        self.logo_rect.y = math.ceil(self.screen.get_height()/4)
 
 
         # charger la carte (tmx)
@@ -63,7 +71,7 @@ class Game:
         self.player2_2 = Player(player_position2_2.x, player_position2_2.y, "skin_rose.png", 2)
         self.player2_3 = Player(player_position2_3.x, player_position2_3.y, "skin_rose.png", 2)
 
-
+        self.players = [self.player1_1,self.player1_2,self.player1_3,self.player2_1,self.player2_2,self.player2_3]
 
     #definir listes pour les collisions
         self.walls = []
@@ -81,12 +89,13 @@ class Game:
             elif obj.type == "tuyaux":
                 self.tuyaux.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
 
-        self.team1.append(pygame.Rect(self.player1_1.position[0],self.player1_1.position[1],20,24))
-        self.team1.append(pygame.Rect(self.player1_2.position[0],self.player1_2.position[1],20,24))
-        self.team1.append(pygame.Rect(self.player1_3.position[0],self.player1_3.position[1],20,24))
-        self.team2.append(pygame.Rect(self.player2_1.position[0],self.player2_1.position[1],20,24))
-        self.team2.append(pygame.Rect(self.player2_2.position[0],self.player2_2.position[1],20,24))
-        self.team2.append(pygame.Rect(self.player2_3.position[0],self.player2_3.position[1],20,24))
+        #ajout des coordonnées de chaque joueur dans la liste correspondante
+        self.team1.append(pygame.Rect(self.player1_1.position[0],self.player1_1.position[1],28,34))
+        self.team1.append(pygame.Rect(self.player1_2.position[0],self.player1_2.position[1],28,34))
+        self.team1.append(pygame.Rect(self.player1_3.position[0],self.player1_3.position[1],28,34))
+        self.team2.append(pygame.Rect(self.player2_1.position[0],self.player2_1.position[1],28,34))
+        self.team2.append(pygame.Rect(self.player2_2.position[0],self.player2_2.position[1],28,34))
+        self.team2.append(pygame.Rect(self.player2_3.position[0],self.player2_3.position[1],28,34))
 
 
 
@@ -117,31 +126,45 @@ class Game:
     def handle_input(self,player):
         pressed = pygame.key.get_pressed()
 
+        #sauter
         if pressed[pygame.K_UP] and player.touchGround == 1:
             player.move_up()
-        elif pressed[pygame.K_DOWN] and player.touchGround == 1:
+        #utiliser un tuyau
+        elif pressed[pygame.K_DOWN] and player.touchGround == 1 and self.actually_on_tuyau(player):
             self.take_tuyaux(player, self.is_on_tuyaux(player))
-
+        #aller a gauche
         elif pressed[pygame.K_LEFT]:
             player.move_left()
+        #aller a droite
         elif pressed[pygame.K_RIGHT]:
             player.move_right()
-        elif pressed[pygame.K_ESCAPE]:
+        #mettre en "pause"
+        elif pressed[pygame.K_ESCAPE] and self.winner == None:
             self.is_playing = False
             pygame.mixer.music.stop()
             self.music = pygame.mixer.music.load("menu.mp3")
             pygame.mixer.music.play(100)
 
+        #tirer
         elif pressed[pygame.K_1] and player.touchGround == 1 and self.winner == None:
             self.tir(player)
+        #lancer une grenade
         elif pressed[pygame.K_2] and player.touchGround == 1 and self.winner == None:
             self.grenades(player)
 
+#permet de savoir si le joueur se trouve sur un tuyau
+    def actually_on_tuyau(self, player):
+        if player.rect.collidelist(self.tuyaux) > -1:
+            return True
+        else:
+            return False
 
 #detecte si le joueur se trouve sur le tuyaux 1 ou 2
     def is_on_tuyaux(self, player):
+        #renvoie les coordonnée du tuyau 2
         if player.rect.colliderect(self.tuyaux[0]):
             return self.tuyaux2
+        #renvoie les coordonnées du tuyau 1
         elif player.rect.colliderect(self.tuyaux[1]):
             return self.tuyaux1
 
@@ -155,28 +178,40 @@ class Game:
     def update(self, player):
         self.group.update()
 
-        #verif collision
+        #verif collision avec un mur ou sol
         if player.feet.collidelist(self.walls) > -1:
             player.move_back()
+        #verif que le joueur touche le sol
         if player.feet.collidelist(self.ground) > -1:
             player.groundTouched()
         else:
             player.touchGround = 0
+        #change la vitesse du joueur s'il se trouve dans les airs ou non
         player.is_in_air()
 
 
 
 #Permet d'afficher l'écran d'affichage du gagnant
     def win_screen(self):
-        # Display win screen
+        # création écran de win
         self.screen.blit(self.background, (0, 0))
         font = pygame.font.SysFont(None, 100)
+        #verif si joueur 1 a gagner
         if self.winner == 1:
-            text = font.render("PLAYER 1 IS THE WINNER", True, (255, 0, 0))
+            text = font.render("L'équipe orange a gagné !", True, (255, 127, 0))
+        #verif si joueur 2 a gagné
         else:
-            text = font.render("PLAYER 2 IS THE WINNER", True, (255, 0, 0))
+            text = font.render("L'équipe rose a gagné !", True, (255, 105, 180))
+        #affiche le texte à l'écran
         text_rect = text.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 2))
         self.screen.blit(text, text_rect)
+        self.screen.blit(self.quit_button, self.quit_button_rect)
+        #met le son pour la victoire si pas déjà activer
+        if self.win_music_is_playing == False:
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("win_sound.mp3")
+            pygame.mixer.music.play()
+            self.win_music_is_playing = True
         pygame.display.flip()
 
 
@@ -410,11 +445,17 @@ class Game:
     ################################### GRENADE END ###################################
 
 
-
+    def actu_pv(self):
+        for player in self.players:
+            if player.is_alive:
+                player.update()
+                self.screen.blit(player.image, player.rect.topleft)
+                player.draw_health_bar(self.screen)
 
 #Fonction principale du jeu
     def run(self):
 
+        #permet de régler les images par secondes du jeu
         clock = pygame.time.Clock()
 
         #boucle du jeu
@@ -426,6 +467,7 @@ class Game:
 
                 self.actu_liste_collision()
 
+            ##################### Début tour par tour #####################
                 if self.player1_1.is_alive and self.player1_1.tour == True:
                     player = self.player1_1
                     player.save_location()
@@ -433,6 +475,8 @@ class Game:
                     self.update(self.player2_3)
                     self.update(player)
                     self.group.draw(self.screen)
+                    self.actu_pv()
+
                 elif self.player2_1.is_alive and self.player2_1.tour == True:
                     player = self.player2_1
                     player.save_location()
@@ -440,6 +484,8 @@ class Game:
                     self.update(self.player1_1)
                     self.update(player)
                     self.group.draw(self.screen)
+                    self.actu_pv()
+
                 elif self.player1_2.is_alive and self.player1_2.tour == True:
                     player = self.player1_2
                     player.save_location()
@@ -447,6 +493,8 @@ class Game:
                     self.update(self.player2_1)
                     self.update(player)
                     self.group.draw(self.screen)
+                    self.actu_pv()
+
                 elif self.player2_2.is_alive and self.player2_2.tour == True:
                     player = self.player2_2
                     player.save_location()
@@ -454,6 +502,8 @@ class Game:
                     self.update(self.player1_2)
                     self.update(player)
                     self.group.draw(self.screen)
+                    self.actu_pv()
+
                 elif self.player1_3.is_alive and self.player1_3.tour == True:
                     player = self.player1_3
                     player.save_location()
@@ -461,6 +511,8 @@ class Game:
                     self.update(self.player2_2)
                     self.update(player)
                     self.group.draw(self.screen)
+                    self.actu_pv()
+
                 elif self.player2_3.is_alive and self.player2_3.tour == True:
                     player = self.player2_3
                     player.save_location()
@@ -468,6 +520,8 @@ class Game:
                     self.update(self.player1_3)
                     self.update(player)
                     self.group.draw(self.screen)
+                    self.actu_pv()
+                #Autorise tout le monde à rejouer un tour
                 else:
                     self.player1_1.tour = True
                     self.player1_2.tour = True
@@ -476,24 +530,34 @@ class Game:
                     self.player2_2.tour = True
                     self.player2_3.tour = True
 
+            ##################### Fin tour par tour #####################
+
+                #verif si l'équipe 1 est morte
                 if self.player1_1.is_alive == self.player1_2.is_alive == self.player1_3.is_alive == False:
                     self.winner = 2
                     self.win_screen()
+                #verif si l'équipe 2 est morte
                 elif self.player2_1.is_alive == self.player2_2.is_alive == self.player2_3.is_alive == False:
                     self.winner = 1
                     self.win_screen()
 
 
+            # affiche l'ecran menu
             else:
                 self.screen.blit(self.background, (0,0))
                 self.screen.blit(self.start_button, self.start_button_rect)
                 self.screen.blit(self.quit_button, self.quit_button_rect)
-
+                self.screen.blit(self.logo, self.logo_rect)
+                font = pygame.font.SysFont(None, 50)
+                text = font.render("Made by: HOUTON Gaby - THIBON-SOULA Achille – MONSALLIER Corentin - FRIKHA Amine – VARELLA Anthony ", True, (255, 0, 0))
+                text_rect = text.get_rect(center=(self.screen.get_width() / 2, 1000))
+                self.screen.blit(text, text_rect)
 
 
             #mettre a jour l ecran
             pygame.display.flip()
 
+            #Boucle de tous les événements possibles
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -501,11 +565,15 @@ class Game:
                     #verif si le joueur clique sur un boutton avec la souris
                     if self.start_button_rect.collidepoint(event.pos) and self.is_playing == False:
                         pygame.mixer.music.stop()
-                        self.music = pygame.mixer.music.load("music_ig.mp3")
-                        pygame.mixer.music.play(100)
+                        pygame.mixer.music.load("music_ig.mp3")
+                        pygame.mixer.music.play(-1)
                         #mettre le jeu en mode lancé
                         self.is_playing = True
-                    elif self.quit_button_rect.collidepoint(event.pos) and self.is_playing == False:
+                    #active le boutton quitter si on est dans le menu
+                    elif self.quit_button_rect.collidepoint(event.pos) and self.is_playing == False :
+                        running = False
+                    #active le boutton quitter si la partie est finie
+                    elif self.quit_button_rect.collidepoint(event.pos) and self.winner > 0:
                         running = False
 
             clock.tick(60)
